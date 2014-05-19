@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+				http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+     
+    <!-- 自动扫描与装配bean -->
+    <context:annotation-config/>
+	<context:component-scan base-package="com.silksoftware"></context:component-scan>
+	
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+    <!-- 定义数据源的信息 -->  
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"  
+        destroy-method="close">  
+        <!-- <property name="driverClass">  
+            <value>com.mysql.jdbc.Driver</value>  
+        </property>  
+        <property name="jdbcUrl">  
+            <value>jdbc:mysql://192.168.1.123:3306/ssh</value>  
+        </property>  
+        <property name="user">  
+            <value>root</value>  
+        </property>  
+        <property name="password">  
+            <value>root</value>  
+        </property>  -->
+        <property name="jdbcUrl" value="${jdbcUrl}"></property>
+		<property name="driverClass" value="${driverClass}"></property>
+		<property name="user" value="${username}"></property>
+		<property name="password" value="${password}"></property>  
+    </bean>  
+  
+    <!--定义Hibernate的SessionFactory -->  
+    <!-- SessionFactory使用的数据源为上面的数据源 -->  
+    <!-- 指定了Hibernate的映射文件和配置信息 -->  
+    <!-- <bean id="sessionFactory"  
+        class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">   -->
+    <!-- 指定通过AnnotationSessionFactoryBean -->
+    <bean id="sessionFactory" 
+    	class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource">  
+            <ref local="dataSource" />  
+        </property> 
+        <property name="packagesToScan">  
+            <list>  
+                <value>com.silksoftware.domain</value>  
+            </list>  
+        </property>
+        <!-- <property name="annotatedClasses">
+            <list>
+                <value>com.silksoftware.domain.User</value>
+            </list>
+        </property> -->
+        <!-- <property name="mappingResources">  
+            <list>  
+                <value>com/silksoftware/domain/User.hbm.xml</value>  
+            </list>  
+        </property>  --> 
+        <property name="hibernateProperties">  
+            <props>  
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>  
+                <prop key="show_sql">true</prop>  
+                <prop key="hibernate.jdbc.batch_size">20</prop>  
+            </props>  
+        </property>
+    </bean>  
+  
+    <bean id="transactionManager"  
+        class="org.springframework.orm.hibernate3.HibernateTransactionManager">  
+        <property name="sessionFactory" ref="sessionFactory" />  
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>  
+  
+    <!-- <bean id="baseDao" class="com.silksoftware.daoImpl.UserDao">  
+        <property name="sessionFactory">  
+            <ref bean="sessionFactory" />  
+        </property>  
+    </bean>  --> 
+  
+
+    <!-- <bean id="userManagerService" class="com.silksoftware.serviceImpl.UserMangerImpl">  
+        <property name="dao">  
+            <ref bean="baseDao" />  
+        </property>  
+    </bean>  
+ 
+    <bean id="registerAction" class="com.silksoftware.action.RegisterAction">  
+        <property name="userManagerService">  
+            <ref bean="userManagerService" />  
+        </property>
+    </bean> -->
+  
+    <!-- more bean definitions go here -->  
+  
+</beans> 
